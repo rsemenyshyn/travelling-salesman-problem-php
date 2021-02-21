@@ -2,11 +2,12 @@
   "name": "rsemenyshyn/travelling-salesman-problem-php",
   "description": "Travelling salesman problem implementation in PHP.",
   "type": "library",
+  "license": "MIT",
   "keywords": [
     "discrete optimization",
     "operations research"
   ],
-  "homepage": "https://github.com/rsemenyshyn/travelling-salesman-problem-php",
+  "homepage": "https://github.com/evaldaskocys/travelling-salesman-problem-php",
   "authors": [
     {
       "name": "Evaldas Kocys",
