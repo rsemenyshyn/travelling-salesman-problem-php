@@ -19,8 +19,5 @@
     "psr-4": {
       "TSP\\": "src/"
     }
-  },
-  "require": {
-    "phpunit/phpunit": "^5.7"
   }
 }
