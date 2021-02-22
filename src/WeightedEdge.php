@@ -47,4 +47,12 @@ class WeightedEdge
     {
         return $this->weight;
     }
+
+    /**
+     * @return array
+     */
+    public function getPoints()
+    {
+        return [$this->getFirst(), $this->getSecond()];
+    }
 }
