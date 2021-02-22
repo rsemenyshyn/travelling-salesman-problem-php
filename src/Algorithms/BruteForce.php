@@ -18,6 +18,9 @@ class BruteForce implements AlgorithmInterface
     /** @var array */
     protected $bestTour = [];
 
+    /** @var int */
+    protected $fixedStart = -1;
+
     /**
      * @param WeightedEdge[] $edges
      * @param int $size
@@ -30,17 +33,23 @@ class BruteForce implements AlgorithmInterface
         if (!$order) {
             return null;
         }
-
         $this->edges = $edges;
-
         $items = [];
         for ($i = 1; $i < $order; $i++) {
             $items[] = $i;
         }
         $this->permutations($items);
-
         return $this->bestTour;
     }
+
+    public function setFixedStart($index) {
+        $this->fixedStart = $index;
+    }
+
+    public function getFixedStart() {
+        return $this->fixedStart;
+    }
+
 
     /**
      * @inheritdoc
@@ -78,7 +87,6 @@ class BruteForce implements AlgorithmInterface
     {
         $weight = 0;
         $tour = [];
-
         for($i = 0; $i < count($perms) - 1; $i++) {
             /** @var WeightedEdge $weightedEdge */
             foreach($this->edges as $weightedEdge) {
@@ -90,8 +98,33 @@ class BruteForce implements AlgorithmInterface
                 }
             }
         }
+        $this->checkAndSaveTour($tour, $weight);
+    }
 
-        if ($weight < $this->minWeight || $this->minWeight == 0) {
+    protected function checkAndSaveTour($tour, $weight) {
+        $startPointIsFine = true;
+        $endPointIsFine = true;
+        if ($this->fixedStart >= 0) {
+            /** @var WeightedEdge $edgeFirst */
+            /** @var WeightedEdge $edgeSecond */
+            /** @var WeightedEdge $edgeBeforeLast */
+            /** @var WeightedEdge $edgeLast */
+            $edgeFirst = reset($tour);
+            $edgeSecond = count($tour) > 1 ? $tour[1] : null;
+            if ($edgeFirst && $edgeSecond) {
+                // edges are point-point-...: .-.-.-
+                // the second edge has one point from first also (chain example above)
+                // if start is fixed, it shold be in points of first edge, but not in second edge
+                $startPointIsFine = in_array($this->fixedStart, $edgeFirst->getPoints()) && !in_array($this->fixedStart, $edgeSecond->getPoints());
+            }
+            $edgeLast = count($tour) > 1 ? $tour[count($tour) - 1] : null;
+            $edgeBeforeLast = count($tour) > 2 ? $tour[count($tour) - 2] : null;
+            if($edgeBeforeLast && $edgeLast) {
+                // the logic is similar to the one with Start Point, we want to return back
+                $endPointIsFine = in_array($this->fixedStart, $edgeLast->getPoints()) && !in_array($this->fixedStart, $edgeBeforeLast->getPoints());
+            }
+        }
+        if ($startPointIsFine && $endPointIsFine && ($weight < $this->minWeight || $this->minWeight == 0)) {
             $this->minWeight = $weight;
             $this->bestTour = $tour;
         }
